@@ -101,6 +101,72 @@ metastatment(try(S1, S2))   --> spaces, "TRY", spaces, metastatment(S1), spaces,
 metastatment(comp(S1, S2))  --> spaces, statment(S1),spaces,";",spaces, metastatment(S2),spaces.
 metastatment(X)             --> statment(X).
 
+%################# Lable ###############################
+
+lableE(var(X), var(X, Num), Num).
+lableE(true, true(Num), Num).
+lableE(false, false(Num), Num).
+lableE(not(X), not(X1, Num), Num):-
+    lableE(X, X1, Num).
+lableE(and(X, Y), and(X1, Y1), Num):-
+    lableE(X, X1, Num),
+    lableE(Y, Y1, Num).
+lableE(eq(X, Y), eq(X1, Y1, Num), Num):-
+    lableE(X, X1, Num),
+    lableE(Y, Y1, Num).
+lableE(leq(X, Y), leq(X1, Y1, Num), Num):-
+    lableE(X, X1, Num),
+    lableE(Y, Y1, Num).
+
+lableE(num(N), num(N, Num), Num).
+
+lableE(var(X), var(X1, Num), Num):-
+    lableE(X, X1, Num).
+
+lableE(add(X, Y), add(X1, Y1, Num), Num):-
+    lableE(X, X1, Num),
+    lableE(Y, Y1, Num).
+
+lableE(mul(X, Y), mul(X1, Y1, Num), Num):- 
+    lableE(X, X1, Num),
+    lableE(Y, Y1, Num).
+
+lableE(sb(X, Y), sb(X1, Y1, Num), Num):-
+    lableE(X, X1, Num),
+    lableE(Y, Y1, Num).
+
+lableE(div(X, Y), div(X1, Y1, Num), Num):-
+    lableE(X, X1, Num),
+    lableE(Y, Y1, Num).
+
+lable(comp(S1, S2), comp(S1_l, S2_l, Cur), Big, End):-
+    Cur is Big,
+    lable(S1, S1_l, Big+1, Inter),
+    lable(S2, S2_l, Inter, End).
+
+lable(try(S1, S2), try(S1_l, S2_l, Cur), Big, End):-
+    Cur is Big,
+    lable(S1, S1_l, Big+1, Inter),
+    lable(S2, S2_l, Inter, End).
+
+lable(cond(B, S1, S2), cond(B1, S1_l, S2_l, Cur), Big, End):-
+    Cur is Big,
+    lableE(B, B1, Cur),
+    lable(S1, S1_l, Big+1, Inter),
+    lable(S2, S2_l, Inter, End).
+
+lable(loop(B, S1), loop(B, S1_l, Big), Big, Cur):-
+    Cur is Big,
+    lableE(B, B1, Cur),
+    lable(S1, S1_l, Big+1, End).
+
+lable(skip, skip(Big), Big, Big+1):-
+    Cur is Big.
+
+lable(asign(Var, Val), asign(Var, Val1, Cur), Big, Big+1):-
+    Cur is Big,
+    lableE(Val, Val1, Cur).
+
 %################# COMPILER CODE ###################################
 
 ca(num(X), [puch(X)]).

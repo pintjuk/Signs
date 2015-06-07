@@ -1,6 +1,6 @@
 #!/usr/bin/env  swipl
 :- set_prolog_flag(verbose, silent).
-:- consult('cwhile').
+:- consult('cwhilext').
 :- initialization main.
 
 debug_flag([debug|Rest], true, Rest).
