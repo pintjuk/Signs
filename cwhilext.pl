@@ -139,9 +139,8 @@ lableE(div(X, Y), div(X1, Y1, Num), Num):-
     lableE(X, X1, Num),
     lableE(Y, Y1, Num).
 
-lable(comp(S1, S2), comp(S1_l, S2_l, Cur), Big, End):-
-    Cur is Big,
-    lable(S1, S1_l, Big+1, Inter),
+lable(comp(S1, S2), comp(S1_l, S2_l), Big, End):-
+    lable(S1, S1_l, Big, Inter),
     lable(S2, S2_l, Inter, End).
 
 lable(try(S1, S2), try(S1_l, S2_l, Cur), Big, End):-
@@ -155,12 +154,12 @@ lable(cond(B, S1, S2), cond(B1, S1_l, S2_l, Cur), Big, End):-
     lable(S1, S1_l, Big+1, Inter),
     lable(S2, S2_l, Inter, End).
 
-lable(loop(B, S1), loop(B, S1_l, Big), Big, Cur):-
+lable(loop(B, S1), loop(B1, S1_l, Cur), Big, Cur):-
     Cur is Big,
     lableE(B, B1, Cur),
     lable(S1, S1_l, Big+1, End).
 
-lable(skip, skip(Big), Big, Big+1):-
+lable(skip, skip(Cur), Big, Big+1):-
     Cur is Big.
 
 lable(asign(Var, Val), asign(Var, Val1, Cur), Big, Big+1):-
@@ -169,75 +168,75 @@ lable(asign(Var, Val), asign(Var, Val1, Cur), Big, Big+1):-
 
 %################# COMPILER CODE ###################################
 
-ca(num(X), [puch(X)]).
-ca(var(X), [fetch(X)]).
-ca(add(A1, A2), Code):-
+ca(num(X, Num), [puch(X, Num)]).
+ca(var(X, Num), [fetch(X, Num)]).
+ca(add(A1, A2, Num), Code):-
     ca(A1, Code1),
     ca(A2, Code2),
-    append([Code2, Code1, [add]], Code).
+    append([Code2, Code1, [add(Num)]], Code).
 
-ca(mul(A1, A2), Code):-
+ca(mul(A1, A2, Num), Code):-
     ca(A1, Code1),
     ca(A2, Code2),
-    append([Code2, Code1, [mult]], Code).
+    append([Code2, Code1, [mult(Num)]], Code).
 
-ca(sb(A1, A2), Code):-
+ca(sb(A1, A2, Num), Code):-
     ca(A1, Code1),
     ca(A2, Code2),
-    append([Code2, Code1, [subt]], Code).
+    append([Code2, Code1, [subt(Num)]], Code).
 
-ca(div(A1, A2), Code):-
+ca(div(A1, A2, Num), Code):-
     ca(A1, Code1),
     ca(A2, Code2),
-    append([Code2, Code1, [div]], Code).
+    append([Code2, Code1, [div(Num)]], Code).
 
-cb(true, [true]).
-cb(false, [false]).
+cb(true(Num), [true(Num)]).
+cb(false(Num), [false(Num)]).
 
-cb(eq(A1, A2), Code):-
+cb(eq(A1, A2, Num), Code):-
     ca(A1, Code1),
     ca(A2, Code2),
-    append([Code2, Code1, [eq]], Code).
+    append([Code2, Code1, [eq(Num)]], Code).
 
-cb(leq(A1, A2), Code):-
+cb(leq(A1, A2, Num), Code):-
     ca(A1, Code1),
     ca(A2, Code2),
-    append([Code2, Code1, [le]], Code).
+    append([Code2, Code1, [le(Num)]], Code).
 
-cb(not(X), Code):-
+cb(not(X, Num), Code):-
     cb(X, Code1),
-    append([Code1, [neg]], Code).
+    append([Code1, [neg(Num)]], Code).
 
-cb(and(A1, A2), Code):-
+cb(and(A1, A2, Num), Code):-
     cb(A1, Code1),
     cb(A2, Code2),
-    append([Code2, Code1, [and]], Code).
+    append([Code2, Code1, [and(Num)]], Code).
 
-cs(asign(X, A), Code):-
+cs(asign(X, A, Num), Code):-
     ca(A, ACode),
-    append([ACode, [store(X)]], Code).
+    append([ACode, [store(X, Num)]], Code).
 
-cs(skip, [noop]).
+cs(skip(Num), [noop(Num)]).
 
 cs(comp(S1, S2), Code):-
     cs(S1, Code1),
     cs(S2, Code2),
     append([Code1,Code2], Code).
 
-cs(cond(B, S1, S2), Code):-
+cs(cond(B, S1, S2, Num), Code):-
     cb(B, Bcode),
     cs(S1, S1code),
     cs(S2, S2code),
-    append([Bcode,[branch(S1code, S2code)]], Code).
+    append([Bcode,[branch(S1code, S2code, Num)]], Code).
 
-cs(loop(B, S), [loop(Bcode, Scode)]):-
+cs(loop(B, S, Num), [loop(Bcode, Scode, Num)]):-
     cb(B, Bcode),
     cs(S, Scode).
 
-cs(try(S1, S2), Code):-
+cs(try(S1, S2, Num), Code):-
     cs(S1, S1code),
     cs(S2, S2code),
-    append([[try], S1code, [catch(S2code)]], Code).
+    append([[try(Num)], S1code, [catch(S2code, Num)]], Code).
 
 %#################### VM CODE ######################
 
