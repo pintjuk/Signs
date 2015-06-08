@@ -239,6 +239,231 @@ cs(try(S1, S2, Num), Code):-
     append([[try(Num)], S1code, [catch(S2code, Num)]], Code).
 
 %#################### VM CODE ######################
+%#################### abstract operations ##########
+lub(X, X, X).
+lub(none, X, X).
+lub(X, none, X).
+
+lub(any, _, any).
+lub(_, any, any).
+lub(err, _, any).
+lub(_, err, any).
+lub(z, _, z).
+lub(_, z, z).
+
+lub(neg, zero, non_pos).
+lub(neg, pos, non_zero).
+lub(neg, non_pos, non_pos).
+lub(neg, non_zero, non_zero).
+lub(neg, non_neg, z).
+lub(zero, neg, non_pos).
+lub(zero, pos, non_neg).
+lub(zero, non_pos, non_pos).
+lub(zero, non_zero, z).
+lub(zero, non_neg, non_neg).
+lub(pos, neg, non_zero).
+lub(pos, zero, non_neg).
+lub(pos, non_pos, z).
+lub(pos, non_zero, non_zero).
+lub(pos, non_neg, non_neg).
+lub(non_pos, neg, non_pos).
+lub(non_pos, zero, non_pos).
+lub(non_pos, pos, z).
+lub(non_pos, non_zero, z).
+lub(non_pos, non_neg, z).
+lub(non_zero, neg, non_zero).
+lub(non_zero, pos, non_zero).
+lub(non_zero, zero, z).
+lub(non_zero, non_pos, z).
+lub(non_zero, non_neg, z).
+lub(non_neg, zero, non_neg).
+lub(non_neg, pos, non_neg).
+lub(non_neg, neg, z).
+lub(non_neg, non_zero, z).
+lub(non_neg, non_pos, z).
+
+lub(tt, ff, t).
+lub(tt, t, t).
+lub(ff, tt, t).
+lub(ff, t, t).
+lub(t, tt, t).
+lub(t, ff, t).
+
+add_s(none, _, none).
+add_s(_, none, none).
+add_s(err, _, err).
+add_s(_, err, err).
+add_s(any, _, any).
+add_s(_, any, any).
+add_s(z, _, z).
+add_s(_, z, z).
+
+add_s(neg, neg, neg).
+add_s(neg, pos, z).
+add_s(neg, non_pos, neg).
+add_s(neg, non_zero, z).
+add_s(neg, non_neg, z).
+add_s(zero, zero, zero).
+add_s(zero, X, X).
+add_s(X, zero, X).
+add_s(pos, neg, z).
+add_s(pos, pos, pos).
+add_s(pos, non_pos, z).
+add_s(pos, non_zero, z).
+add_s(pos, non_neg, pos).
+add_s(non_pos, neg, neg).
+add_s(non_pos, pos, z).
+add_s(non_pos, non_zero, z).
+add_s(non_pos, non_neg, z).
+add_s(non_zero, neg, z).
+add_s(non_zero, pos, z).
+add_s(non_zero, non_pos, z).
+add_s(non_zero, non_neg, z).
+add_s(non_neg, neg, z).
+add_s(non_neg, pos, pos).
+add_s(non_neg, non_pos, z).
+add_s(non_neg, non_zero, z).
+
+sub_s(err, _, err).
+sub_s(_, err, err).
+sub_s(none, _, none).
+sub_s(_, none, none).
+sub_s(z, _, z).
+sub_s(_, z, z).
+sub_s(neg, neg, z).
+sub_s(neg, zero, neg).
+sub_s(neg, pos, neg).
+sub_s(neg, non_pos, z).
+sub_s(neg, non_zero, z).
+sub_s(neg, non_neg, neg).
+
+sub_s(zero, neg, pos).
+sub_s(zero, zero, zero).
+sub_s(zero, pos, neg).
+sub_s(zero, non_pos, non_neg).
+sub_s(zero, non_zero, non_zero).
+sub_s(zero, non_neg, non_pos).
+
+sub_s(pos, neg, pos).
+sub_s(pos, zero, pos).
+sub_s(pos, pos, z).
+sub_s(pos, non_pos, pos).
+sub_s(pos, non_zero, z).
+sub_s(pos, non_neg, z).
+
+sub_s(non_pos, neg, z).
+sub_s(non_pos, zero, non_pos).
+sub_s(non_pos, pos, neg).
+sub_s(non_pos, non_pos, z).
+sub_s(non_pos, non_zero, z).
+sub_s(non_pos, non_neg, non_pos).
+
+sub_s(non_zero, neg, z).
+sub_s(non_zero, zero, non_zero).
+sub_s(non_zero, pos, z).
+sub_s(non_zero, non_pos, z).
+sub_s(non_zero, non_zero, z).
+sub_s(non_zero, non_neg, z).
+
+sub_s(non_neg, neg, pos).
+sub_s(non_neg, zero, non_neg).
+sub_s(non_neg, pos, z).
+sub_s(non_neg, non_pos, non_neg).
+sub_s(non_neg, non_zero, z).
+sub_s(non_neg, non_neg, z).
+
+mul_s(err, _, err).
+mul_s(_, err, err).
+mul_s(none, _, none).
+mul_s(_, none, none).
+mul_s(zero, _, zero).
+mul_s(_, zero, zero).
+mul_s(z, _, z).
+mul_s(_, z, z).
+
+mul_s(neg, neg, pos).
+mul_s(neg, pos, neg).
+mul_s(neg, non_pos, non_neg).
+mul_s(neg, non_zero, non_zero).
+mul_s(neg, non_neg, non_pos).
+
+mul_s(pos, neg, neg).
+mul_s(pos, pos, pos).
+mul_s(pos, non_pos, non_pos).
+mul_s(pos, non_zero, non_zero).
+mul_s(pos, non_neg, non_neg).
+
+mul_s(neg, neg, pos).
+mul_s(pos, neg, neg).
+mul_s(non_pos, neg, non_neg).
+mul_s(non_zero, neg, non_zero).
+mul_s(non_neg, neg, non_pos).
+
+mul_s(neg, pos, neg).
+mul_s(pos, pos, pos).
+mul_s(non_pos, pos, non_pos).
+mul_s(non_zero, pos, non_zero).
+mul_s(non_neg, pos, non_neg).
+
+mul_s(non_pos, non_pos, non_neg).
+mul_s(non_pos, non_zero, z).
+mul_s(non_pos, non_neg, non_pos).
+mul_s(non_zero, non_pos, z).
+mul_s(non_zero, non_zero, non_zero).
+mul_s(non_zero, non_neg, z).
+mul_s(non_neg, non_pos, non_pos).
+mul_s(non_neg, non_zero, z).
+mul_s(non_neg, non_neg, non_neg).
+
+div_s(err, _, err).
+div_s(_, err, err).
+div_s(none, _, none).
+div_s(_, none, none).
+div_s(_, zero, err).
+div_s(any, _, any).
+div_s(_, any, any).
+
+div_s(neg, neg, pos).
+div_s(neg, pos, neg).
+div_s(neg, non_pos, any).
+div_s(neg, non_zero, any).
+div_s(neg, non_neg, neg).
+
+div_s(zero, neg, pos).
+div_s(zero, zero, zero).
+div_s(zero, pos, neg).
+div_s(zero, non_pos, non_neg).
+div_s(zero, non_zero, non_zero).
+div_s(zero, non_neg, non_pos).
+
+div_s(pos, neg, pos).
+div_s(pos, zero, pos).
+div_s(pos, pos, any).
+div_s(pos, non_pos, pos).
+div_s(pos, non_zero, any).
+div_s(pos, non_neg, any).
+
+div_s(non_pos, neg, any).
+div_s(non_pos, zero, non_pos).
+div_s(non_pos, pos, neg).
+div_s(non_pos, non_pos, any).
+div_s(non_pos, non_zero, any).
+div_s(non_pos, non_neg, non_pos).
+
+div_s(non_zero, neg, any).
+div_s(non_zero, zero, non_zero).
+div_s(non_zero, pos, any).
+div_s(non_zero, non_pos, any).
+div_s(non_zero, non_zero, any).
+div_s(non_zero, non_neg, any).
+
+div_s(non_neg, neg, pos).
+div_s(non_neg, zero, non_neg).
+div_s(non_neg, pos, any).
+div_s(non_neg, non_pos, non_neg).
+div_s(non_neg, non_zero, any).
+div_s(non_neg, non_neg, any).
+
 
 evl([[puch(X)|C], E, S, norm, I],        [C,[X|E], S, norm, I]).
 
