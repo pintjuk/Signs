@@ -465,6 +465,67 @@ div_s(non_neg, non_pos, z).
 div_s(non_neg, non_zero, any).
 div_s(non_neg, non_neg, any).
 
+eq_s(none, _, none).
+eq_s(_, none, none).
+eq_s(any, _, any).
+eq_s(_, any, any).
+eq_s(err, _, err).
+eq_s(_, err, err).
+eq_s(z, _, t).
+eq_s(_, z, t).
+
+eq_s(neg, neg, t).
+eq_s(neg, zero, ff).
+eq_s(neg, pos, ff).
+eq_s(neg, non_pos, t).
+eq_s(neg, non_zero, t).
+eq_s(neg, non_neg, ff).
+
+eq_s(zero, neg, ff).
+eq_s(zero, zero, tt).
+eq_s(zero, pos, ff).
+eq_s(zero, non_pos, t).
+eq_s(zero, non_zero, ff).
+eq_s(zero, non_neg, t).
+
+eq_s(pos, neg, ff).
+eq_s(pos, pos, t).
+eq_s(pos, zero, ff).
+eq_s(pos, non_pos, ff).
+eq_s(pos, non_zero, t).
+eq_s(pos, non_neg, t).
+
+eq_s(neg, neg, t).
+eq_s(zero, neg, ff).
+eq_s(pos, neg, ff).
+eq_s(non_pos, neg, t).
+eq_s(non_zero, neg, t).
+eq_s(non_neg, neg, ff).
+
+eq_s(neg, zero, ff).
+eq_s(zero, zero, tt).
+eq_s(pos, zero, ff).
+eq_s(non_pos, zero, t).
+eq_s(non_zero, zero, ff).
+eq_s(non_neg, zero, t).
+
+eq_s(neg, pos, ff).
+eq_s(pos, pos, t).
+eq_s(zero, pos, ff).
+eq_s(non_pos, pos, ff).
+eq_s(non_zero, pos, t).
+eq_s(non_neg, pos, t).
+
+mul_s(non_pos, non_pos, t).
+mul_s(non_pos, non_zero, t).
+mul_s(non_pos, non_neg, t).
+mul_s(non_zero, non_pos, t).
+mul_s(non_zero, non_zero, t).
+mul_s(non_zero, non_neg, t).
+mul_s(non_neg, non_pos, t).
+mul_s(non_neg, non_zero, t).
+mul_s(non_neg, non_neg, t).
+
 
 evl([[puch(X)|C], E, S, norm, I],        [C,[X|E], S, norm, I]).
 
