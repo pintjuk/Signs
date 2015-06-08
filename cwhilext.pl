@@ -526,6 +526,84 @@ eq_s(non_neg, non_pos, t).
 eq_s(non_neg, non_zero, t).
 eq_s(non_neg, non_neg, t).
 
+leq_s(none, _, none).
+leq_s(_, none, none).
+leq_s(any, _, any).
+leq_s(_, any, any).
+leq_s(err, _, err).
+leq_s(_, err, err).
+leq_s(z, _, t).
+leq_s(_, z, t).
+
+leq_s(neg, neg, t).
+leq_s(neg, zero, tt).
+leq_s(neg, pos, tt).
+leq_s(neg, non_pos, t).
+leq_s(neg, non_zero, t).
+leq_s(neg, non_neg, tt).
+
+leq_s(zero, neg, ff).
+leq_s(zero, zero, tt).
+leq_s(zero, pos, tt).
+leq_s(zero, non_pos, t).
+leq_s(zero, non_zero, t).
+leq_s(zero, non_neg, tt).
+
+leq_s(pos, neg, ff).
+leq_s(pos, pos, ff).
+leq_s(pos, zero, t).
+leq_s(pos, non_pos, ff).
+leq_s(pos, non_zero, t).
+leq_s(pos, non_neg, t).
+
+leq_s(neg, neg, t).
+leq_s(zero, neg, tt).
+leq_s(pos, neg, tt).
+leq_s(non_pos, neg, t).
+leq_s(non_zero, neg, t).
+leq_s(non_neg, neg, tt).
+leq_s(neg, zero, ff).
+leq_s(zero, zero, tt).
+leq_s(pos, zero, tt).
+leq_s(non_pos, zero, t).
+leq_s(non_zero, zero, t).
+leq_s(non_neg, zero, tt).
+leq_s(neg, pos, ff).
+leq_s(pos, pos, ff).
+leq_s(zero, pos, t).
+leq_s(non_pos, pos, ff).
+leq_s(non_zero, pos, t).
+leq_s(non_neg, pos, t).
+
+leq_s(non_pos, non_pos, t).
+leq_s(non_pos, non_zero, t).
+leq_s(non_pos, non_neg, tt).
+leq_s(non_zero, non_pos, t).
+leq_s(non_zero, non_zero, t).
+leq_s(non_zero, non_neg, t).
+leq_s(non_neg, non_pos, t).
+leq_s(non_neg, non_zero, t).
+leq_s(non_neg, non_neg, t).
+
+not_s(none, none).
+not_s(any, any).
+not_s(t, t).
+not_s(tt, ff).
+not_s(ff, tt).
+
+and_s(none, _, none).
+and_s(_, none, none).
+and_s(any, _, any).
+and_s(_, any, any).
+and_s(err, _, err).
+and_s(_, err, err).
+and_s(tt, tt, tt).
+and_s(tt, ff, ff).
+and_s(tt,  t, t).
+and_s(ff, _, ff).
+and_s(t, tt, t).
+and_s(t, ff, ff).
+and_s(t, t, t).
 
 evl([[puch(X)|C], E, S, norm, I],        [C,[X|E], S, norm, I]).
 
