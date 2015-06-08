@@ -291,10 +291,10 @@ lub(t, ff, t).
 
 add_s(none, _, none).
 add_s(_, none, none).
-add_s(err, _, err).
-add_s(_, err, err).
 add_s(any, _, any).
 add_s(_, any, any).
+add_s(err, _, err).
+add_s(_, err, err).
 add_s(z, _, z).
 add_s(_, z, z).
 
@@ -324,10 +324,12 @@ add_s(non_neg, pos, pos).
 add_s(non_neg, non_pos, z).
 add_s(non_neg, non_zero, z).
 
-sub_s(err, _, err).
-sub_s(_, err, err).
 sub_s(none, _, none).
 sub_s(_, none, none).
+sub_s(any, _, any).
+sub_s(_, any, any).
+sub_s(err, _, err).
+sub_s(_, err, err).
 sub_s(z, _, z).
 sub_s(_, z, z).
 sub_s(neg, neg, z).
@@ -372,10 +374,12 @@ sub_s(non_neg, non_pos, non_neg).
 sub_s(non_neg, non_zero, z).
 sub_s(non_neg, non_neg, z).
 
-mul_s(err, _, err).
-mul_s(_, err, err).
 mul_s(none, _, none).
 mul_s(_, none, none).
+mul_s(any, _, any).
+mul_s(_, any, any).
+mul_s(err, _, err).
+mul_s(_, err, err).
 mul_s(zero, _, zero).
 mul_s(_, zero, zero).
 mul_s(z, _, z).
@@ -415,10 +419,12 @@ mul_s(non_neg, non_pos, non_pos).
 mul_s(non_neg, non_zero, z).
 mul_s(non_neg, non_neg, non_neg).
 
-div_s(err, _, err).
-div_s(_, err, err).
 div_s(none, _, none).
 div_s(_, none, none).
+div_s(any, _, any).
+div_s(_, any, any).
+div_s(err, _, err).
+div_s(_, err, err).
 div_s(_, zero, err).
 div_s(any, _, any).
 div_s(_, any, any).
@@ -426,41 +432,36 @@ div_s(_, any, any).
 div_s(neg, neg, pos).
 div_s(neg, pos, neg).
 div_s(neg, non_pos, any).
-div_s(neg, non_zero, any).
-div_s(neg, non_neg, neg).
+div_s(neg, non_zero, non_zero).
+div_s(neg, non_neg, any).
 
-div_s(zero, neg, pos).
-div_s(zero, zero, zero).
-div_s(zero, pos, neg).
-div_s(zero, non_pos, non_neg).
-div_s(zero, non_zero, non_zero).
-div_s(zero, non_neg, non_pos).
+div_s(zero, neg, zero).
+div_s(zero, pos, zero).
+div_s(zero, non_pos, any).
+div_s(zero, non_zero, zero).
+div_s(zero, non_neg, any).
 
-div_s(pos, neg, pos).
-div_s(pos, zero, pos).
-div_s(pos, pos, any).
-div_s(pos, non_pos, pos).
-div_s(pos, non_zero, any).
+div_s(pos, neg, neg).
+div_s(pos, pos, pos).
+div_s(pos, non_pos, any).
+div_s(pos, non_zero, non_zero).
 div_s(pos, non_neg, any).
 
-div_s(non_pos, neg, any).
-div_s(non_pos, zero, non_pos).
-div_s(non_pos, pos, neg).
+div_s(non_pos, neg, non_neg).
+div_s(non_pos, pos, non_pos).
 div_s(non_pos, non_pos, any).
-div_s(non_pos, non_zero, any).
-div_s(non_pos, non_neg, non_pos).
+div_s(non_pos, non_zero, z).
+div_s(non_pos, non_neg, any).
 
-div_s(non_zero, neg, any).
-div_s(non_zero, zero, non_zero).
-div_s(non_zero, pos, any).
+div_s(non_zero, neg, non_zero).
+div_s(non_zero, pos, non_zero).
 div_s(non_zero, non_pos, any).
-div_s(non_zero, non_zero, any).
+div_s(non_zero, non_zero, non_zero).
 div_s(non_zero, non_neg, any).
 
-div_s(non_neg, neg, pos).
-div_s(non_neg, zero, non_neg).
-div_s(non_neg, pos, any).
-div_s(non_neg, non_pos, non_neg).
+div_s(non_neg, neg, non_pos).
+div_s(non_neg, pos, non_neg).
+div_s(non_neg, non_pos, z).
 div_s(non_neg, non_zero, any).
 div_s(non_neg, non_neg, any).
 
