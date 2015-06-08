@@ -516,15 +516,15 @@ eq_s(non_pos, pos, ff).
 eq_s(non_zero, pos, t).
 eq_s(non_neg, pos, t).
 
-mul_s(non_pos, non_pos, t).
-mul_s(non_pos, non_zero, t).
-mul_s(non_pos, non_neg, t).
-mul_s(non_zero, non_pos, t).
-mul_s(non_zero, non_zero, t).
-mul_s(non_zero, non_neg, t).
-mul_s(non_neg, non_pos, t).
-mul_s(non_neg, non_zero, t).
-mul_s(non_neg, non_neg, t).
+eq_s(non_pos, non_pos, t).
+eq_s(non_pos, non_zero, t).
+eq_s(non_pos, non_neg, t).
+eq_s(non_zero, non_pos, t).
+eq_s(non_zero, non_zero, t).
+eq_s(non_zero, non_neg, t).
+eq_s(non_neg, non_pos, t).
+eq_s(non_neg, non_zero, t).
+eq_s(non_neg, non_neg, t).
 
 
 evl([[puch(X)|C], E, S, norm, I],        [C,[X|E], S, norm, I]).
