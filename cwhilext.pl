@@ -605,95 +605,128 @@ and_s(t, tt, t).
 and_s(t, ff, ff).
 and_s(t, t, t).
 
-evl([[puch(X)|C], E, S, norm, I],        [C,[X|E], S, norm, I]).
+abs_z(X, neg):- X<0.
+abs_z(0, zero).
+abs_z(X, pos):- X>0.
+abs_z(err, err).
+abs_t(tt, tt).
+abs_t(ff, ff).
+abs_t(err, err).
 
+%==================== vm implementation
+evl([[puch(X,_)|C], E, S, norm, I],        [C,[Res|E], S, norm, I]):-
+    abs_z(X, Res).
 
-evl([[add|C], [err,_|E], S, norm, I],    [C,[err|E],S, norm, I]).
-evl([[add|C], [_,err|E], S, norm, I],    [C,[err|E],S, norm, I]).
-evl([[add|C], [Z1,Z2|E], S, norm, I],    [C,[Sum|E],S, norm, I]):-
-    Sum is Z1+Z2.
+evl([[add(_)|C], [Z1,Z2|E], S, norm, I],    [C,[Sum|E],S, norm, I]):-
+    add_s(Z1, Z2).
 
-evl([[mult|C], [err,_|E], S, norm, I],   [C,[err|E],S, norm, I]).
-evl([[mult|C], [_,err|E], S, norm, I],   [C,[err|E],S, norm, I]).
-evl([[mult|C], [Z1,Z2|E], S, norm, I],   [C,[Sum|E],S, norm, I]):-
-    Sum is Z1*Z2.
+evl([[mult(_)|C], [Z1,Z2|E], S, norm, I],   [C,[Sum|E],S, norm, I]):-
+    div_s(Z1, Z2).
 
-evl([[subt|C], [_,err|E], S,norm, I],   [C,[err|E],S,norm, I]).
-evl([[subt|C], [err,_|E], S,norm, I],   [C,[err|E],S,norm, I]).
-evl([[subt|C], [Z1,Z2|E], S,norm, I],   [C,[Sum|E],S,norm, I]):-
-    Sum is Z1-Z2.
+evl([[subt(_)|C], [Z1,Z2|E], S,norm, I],   [C,[Sum|E],S,norm, I]):-
+    sub_s(Z1,Z2).
 
-evl([[div|C], [_,0|E], S,norm, I],   [C,[err|E],S,norm, I]).
-evl([[div|C], [_,err|E], S,norm, I],   [C,[err|E],S,norm, I]).
-evl([[div|C], [err,_|E], S,norm, I],   [C,[err|E],S,norm, I]).
-evl([[div|C], [Z1,Z2|E], S,norm, I],   [C,[Res|E],S,norm, I]):-
-    Res is div(Z1,Z2).
+evl([[div(_)|C], [Z1,Z2|E], S,norm, I],   [C,[Res|E],S,norm, I]):-
+    div_s(Z1,Z2).
 
-evl([[true|C], E, S, norm, I],           [C,[tt|E],S, norm, I]).
+evl([[true(_)|C], E, S, norm, I],           [C,[tt|E],S, norm, I]).
 
-evl([[false|C], E, S, norm, I],          [C,[ff|E],S, norm, I]).
+evl([[false(_)|C], E, S, norm, I],          [C,[ff|E],S, norm, I]).
 
+evl([[eq(_)|C], [Z1, Z2| E] , S, norm, I],  [C,[Res|E],S, norm, I]):-
+    eq_s(Z1, Z2, Res).
 
-evl([[eq|C], [err, _| E] , S, norm, I],  [C,[err|E],S, norm, I]).
-evl([[eq|C], [_, err| E] , S, norm, I],  [C,[err|E],S, norm, I]).
-evl([[eq|C], [Z, Z| E] , S, norm, I],  [C,[tt|E],S, norm, I]).
-evl([[eq|C], [_, _| E] , S, norm, I],  [C,[ff|E],S, norm, I]).
+evl([[le(_)|C], [Z1, Z2| E] , S, norm, I],  [C,[tt|E],S, norm, I]):-
+    leq_s(Z1,Z2,Res).
 
+evl([[and(_)|C], [T1, T2| E] , S, norm, I], [C,[Res|E],S, norm, I]):-
+    and_s(T1, T2, Res).
 
-evl([[le|C], [err, _| E] , S, norm, I],  [C,[err|E],S, norm, I]).
-evl([[le|C], [_, err| E] , S, norm, I],  [C,[err|E],S, norm, I]).
-evl([[le|C], [Z1, Z2| E] , S, norm, I],  [C,[tt|E],S, norm, I]):-
-    Z1=<Z2.
-evl([[le|C], [_, _| E] , S, norm, I],  [C,[ff|E],S, norm, I]).
+evl([[neg(_)|C], [T| E] , S, norm, I],     [C,[Res|E],S, norm, I]):-
+    not_s(neg).
 
-evl([[and|C], [err, _| E] , S, norm, I], [C,[err|E],S, norm, I]).
-evl([[and|C], [_, err| E] , S, norm, I], [C,[err|E],S, norm, I]).
-evl([[and|C], [tt, tt| E] , S, norm, I], [C,[tt|E],S, norm, I]).
-evl([[and|C], [ff, tt| E] , S, norm, I], [C,[ff|E],S, norm, I]).
-evl([[and|C], [tt, ff| E] , S, norm, I], [C,[ff|E],S, norm, I]).
-
-evl([[neg|C], [err| E] , S, norm, I],     [C,[err|E],S, norm, I]).
-evl([[neg|C], [tt| E] , S, norm, I],     [C,[ff|E],S, norm, I]).
-evl([[neg|C], [ff| E] , S, norm, I],     [C,[tt|E],S, norm, I]).
-
-evl([[fetch(X)|C], E , S, norm, I],      [C,[RES|E],SNext, norm, I]):-
+evl([[fetch(X,_)|C], E , S, norm, I],      [C,[RES|E],SNext, norm, I]):-
     (
         get_assoc(X, S, RES);
         format('error: fetching undefined variable ~w !~n', [X]), halt
     ), SNext=S.
 
-evl([[store(_)|C], [err|E], S, norm, _], [C, E, S, abnorm, 0]). 
-evl([[store(X)|C], [Z|E] , S, norm, I],  [C,E,SNext, norm, I]):-
+evl([[store(_, _)|C], [Z|E], S, norm, _], [C, E, S, abnorm, 0]):-
+   possiblyErr(Z). 
+evl([[store(X, _)|C], [Z|E] , S, norm, I],  [C,E,SNext, norm, I]):-
+    possiblyInt(Z),
     number(Z), 
     put_assoc(X, S, Z, SNext).
 
-evl([[noop|C], E , S, norm, I],    [C,E,S, norm, I]).
+evl([[noop(_)|C], E , S, norm, I],    [C,E,S, norm, I]).
 
-evl([[branch(_, _)|C], [err|E], S, norm, I],     [C, E, S, abnorm, I]).
-evl([[branch(C1, C2)|C], [T|E] , S, norm, I],   [Cres,E,S, norm, I]):-
-    T=tt, append([C1, C], Cres);
-    T=ff, append([C2, C], Cres).
+evl([[branch(_, _, _)|C], [T|E], S, norm, I],     [C, E, S, abnorm, I]):-
+    possableErr_t(T).
+evl([[branch(C1, C2, _)|C], [T|E] , S, norm, I],   [Cres,E,S, norm, I]):-
+    possiblyTrue(T), 
+    append([C1, C], Cres).
+evl([[branch(C1, C2, _)|C], [T|E] , S, norm, I],   [Cres,E,S, norm, I]):-
+    possablyFalse(T), 
+    append([C2, C], Cres).
 
-evl([[loop(C1, C2)|C], E , S, norm, I],  [ResCode,E,S, norm, I]):-
-    append([C2, [loop(C1, C2)]], BranchBody),
-    append([C1, [branch(BranchBody, [noop])], C], ResCode).
+evl([[loop(C1, C2, Num)|C], E , S, norm, I],  [ResCode,E,S, norm, I]):-
+    append([C2, [loop(C1, C2, Num)]], BranchBody),
+    append([C1, [branch(BranchBody, [noop], Num)], C], ResCode).
 
-evl([[try|C], E, S, abnorm, I], [C, E, S, abnorm, In]):-
+evl([[try(_)|C], E, S, abnorm, I], [C, E, S, abnorm, In]):-
     In is I+1.
-evl([[try|C], E , S, norm, I],    [C,E,S, norm, I]).
+evl([[try(_)|C], E , S, norm, I],    [C,E,S, norm, I]).
 
-evl([[catch(X)|C], E, S, abnorm, 0], [ResCode, E, S, norm, 0]):-
+evl([[catch(X,_)|C], E, S, abnorm, 0], [ResCode, E, S, norm, 0]):-
     append([X, C], ResCode).
 
-evl([[catch(_)|C], E, S, abnorm, I], [C, E, S, abnorm, In]):-
+evl([[catch(_, _)|C], E, S, abnorm, I], [C, E, S, abnorm, In]):-
     In is I-1.
 
-evl([[catch(_)|C], E , S, norm, I],    [C,E,S, norm, I]).
+evl([[catch(_, _)|C], E , S, norm, I],    [C,E,S, norm, I]).
 evl([[W|C], E, S, abnorm, I], [C, E, S, abnorm, I]):-
     \+ W=catch(_),
     \+ W=try.
 
+allnext(Cur, AllNext):-
+    findall(Next, evl(Cur, Next), AllNext).
 
+explore([], Visited, Visited).
+explore([H|T], Visited, Found):-
+    allnext(H, AN),
+    subtract(AN, Visited, NVN),
+    (
+    %if NVN is empty
+        NVN=[],
+        Found=Visited;
+    %else
+        append(T, NVN, NewAggenda),
+        append(Visited, NVN, NewVisited),
+        explore(NewAggenda, NewVisited, Found).
+    ).
+
+lubstates([[Code|_], [STop1|_], S1, norm, _], [[Code|_], [STop2|_],S2, norm, _], [Code, ]):-
+
+
+normal_s([_, _, _, norm, _]).
+processStates([A],A):-
+    normal_s(A)
+
+anolize(Allstates, ChekpointInfo):-
+    findall(ChcikPointInf,
+    (
+        findall(State,
+        (
+            member(State, Allstates),
+            (
+                State=[[store(_, ChcikPoint)|_], _, _, _, _];
+                State=[[branch(_, ChcikPoint)|_], _, _, _, _]
+            )
+        ),
+        CheckPointStates),
+
+    ),
+    ChekpointInfos).
 
 run([[],E, S, N, I], [[], E, S, N, I], _).
 
